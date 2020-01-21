@@ -117,39 +117,7 @@
 							"fileExtension": ".txt"
 						}
 					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "CustomerID",
-									"type": "String"
-								},
-								"sink": {
-									"name": "ActorID"
-								}
-							},
-							{
-								"source": {
-									"name": "LastName",
-									"type": "String"
-								},
-								"sink": {
-									"name": "ActorName"
-								}
-							},
-							{
-								"source": {
-									"name": "FirstName",
-									"type": "String"
-								},
-								"sink": {
-									"name": "Gender"
-								}
-							}
-						]
-					}
+					"enableStaging": false
 				},
 				"inputs": [
 					{
@@ -328,35 +296,7 @@
 							"fileExtension": ".txt"
 						}
 					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "MovieID",
-									"type": "String"
-								},
-								"sink": {
-									"name": "ActorID"
-								}
-							},
-							{
-								"source": {
-									"name": "OnlineMovieID",
-									"type": "String"
-								},
-								"sink": {
-									"name": "ActorName"
-								}
-							},
-							{
-								"sink": {
-									"name": "Gender"
-								}
-							}
-						]
-					}
+					"enableStaging": false
 				},
 				"inputs": [
 					{
