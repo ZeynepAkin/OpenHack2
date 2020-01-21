@@ -1,5 +1,5 @@
 {
-	"name": "TargetCloudSalesAdresses",
+	"name": "VanArsdelCustomer",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "DataLake",
@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Adresses.csv",
-				"folderPath": "CloudSales",
+				"fileName": "dboCustomers.csv",
+				"folderPath": "VanArsdel",
 				"fileSystem": "datafiles1"
 			},
 			"columnDelimiter": ",",
@@ -21,11 +21,15 @@
 		},
 		"schema": [
 			{
-				"name": "AddressID",
+				"name": "CustomerID",
 				"type": "String"
 			},
 			{
-				"name": "CustomerID",
+				"name": "LastName",
+				"type": "String"
+			},
+			{
+				"name": "FirstName",
 				"type": "String"
 			},
 			{
@@ -49,6 +53,10 @@
 				"type": "String"
 			},
 			{
+				"name": "PhoneNumber",
+				"type": "String"
+			},
+			{
 				"name": "CreatedDate",
 				"type": "String"
 			},
@@ -57,6 +65,5 @@
 				"type": "String"
 			}
 		]
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+	}
 }
