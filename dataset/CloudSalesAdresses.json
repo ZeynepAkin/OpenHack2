@@ -1,0 +1,17 @@
+{
+	"name": "CloudSalesAdresses",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "CloudSales",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Addresses"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
