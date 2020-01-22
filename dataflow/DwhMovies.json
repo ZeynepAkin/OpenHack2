@@ -24,9 +24,12 @@
 			"transformations": [
 				{
 					"name": "AlterRow1"
+				},
+				{
+					"name": "DerivedColumn1"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nDwhsource alterRow(upsertIf(not(isNull(MovieID)))) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieID'],\n\tskipKeyWrites:true,\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieID = Dwhsource@MovieID,\n\t\tMovieTitle = Dwhsource@MovieTitle\n\t)) ~> DwhSinkMovies"
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nDerivedColumn1 alterRow(upsertIf(not(isNull(MovieID)))) ~> AlterRow1\nDwhsource derive(RunTimeMin = 1) ~> DerivedColumn1\nAlterRow1 sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieID'],\n\tskipKeyWrites:true,\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieID,\n\t\tMovieTitle\n\t)) ~> DwhSinkMovies"
 		}
 	}
 }
