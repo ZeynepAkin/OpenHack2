@@ -19,15 +19,27 @@
 		},
 		"schema": [
 			{
-				"name": "ActorID",
+				"name": "MovieID",
 				"type": "String"
 			},
 			{
-				"name": "ActorName",
+				"name": "MovieTitle",
 				"type": "String"
 			},
 			{
-				"name": "Gender",
+				"name": "Category",
+				"type": "String"
+			},
+			{
+				"name": "Rating",
+				"type": "String"
+			},
+			{
+				"name": "RunTimeMin",
+				"type": "String"
+			},
+			{
+				"name": "ReleaseDate",
 				"type": "String"
 			}
 		]
