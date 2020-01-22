@@ -1,0 +1,376 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "SouthridgeDF23"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/DWH')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Dimcustomer",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactOrderTransaction')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "DWH",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Order')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Order.csv",
+						"folderPath": "CloudSales",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCloudSalesOrder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Order.csv",
+						"folderPath": "CloudSales",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "OrderID",
+						"type": "String"
+					},
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "OrderDate",
+						"type": "String"
+					},
+					{
+						"name": "ShipDate",
+						"type": "String"
+					},
+					{
+						"name": "TotalCost",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCloudSalesOrderDetail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OrderDetail.csv",
+						"folderPath": "CloudSales",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "OrderDetailID",
+						"type": "String"
+					},
+					{
+						"name": "OrderID",
+						"type": "String"
+					},
+					{
+						"name": "MovieID",
+						"type": "String"
+					},
+					{
+						"name": "Quantity",
+						"type": "String"
+					},
+					{
+						"name": "UnitCost",
+						"type": "String"
+					},
+					{
+						"name": "LineNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OrderTransactionFact')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "TargetCloudSalesOrder",
+								"type": "DatasetReference"
+							},
+							"name": "Order"
+						},
+						{
+							"dataset": {
+								"referenceName": "TargetCloudSalesOrderDetail",
+								"type": "DatasetReference"
+							},
+							"name": "OrderDetail"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "FactOrderTransaction",
+								"type": "DatasetReference"
+							},
+							"name": "TargetOrderTransaction"
+						}
+					],
+					"transformations": [
+						{
+							"name": "OrderJoin"
+						},
+						{
+							"name": "SRDC"
+						},
+						{
+							"name": "JoinSelect"
+						}
+					],
+					"script": "\n\nsource(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as string,\n\t\tShipDate as string,\n\t\tTotalCost as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Order\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as string,\n\t\tUnitCost as string,\n\t\tLineNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> OrderDetail\nOrder, OrderDetail join(Order@OrderID == OrderDetail@OrderID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> OrderJoin\nJoinSelect derive(SourceSystemID = 1,\n\t\tGlobelOrderID = uuid()) ~> SRDC\nOrderJoin select(mapColumn(\n\t\tOrderID = Order@OrderID,\n\t\tCustomerID,\n\t\tOrderDate,\n\t\tShipDate,\n\t\tTotalCost,\n\t\tCreatedDate = Order@CreatedDate,\n\t\tOrderDetailID,\n\t\tMovieID,\n\t\tQuantity,\n\t\tUnitCost,\n\t\tLineNumber,\n\t\tUpdatedDate = Order@UpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> JoinSelect\nSRDC sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Factordertransaction.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true) ~> TargetOrderTransaction"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/TargetCloudSalesOrder')]",
+				"[concat(variables('factoryId'), '/datasets/TargetCloudSalesOrderDetail')]",
+				"[concat(variables('factoryId'), '/datasets/FactOrderTransaction')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "TargetCloudSalesCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "SalesSouthridgeCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "TargetCloudSalesAdresses",
+								"type": "DatasetReference"
+							},
+							"name": "SalesSouthridgeAdresses"
+						},
+						{
+							"dataset": {
+								"referenceName": "TargetCloudStreamingCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingSouthridgeCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "TargetCloudStreamingAddresses",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingSouthridgeAdresses"
+						},
+						{
+							"dataset": {
+								"referenceName": "TargetFourthCoffeeCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "FourthCoffeeCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "VanArsdelCustomer",
+								"type": "DatasetReference"
+							},
+							"name": "VanArselCustomer"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimCustomer",
+								"type": "DatasetReference"
+							},
+							"name": "TargetDimCustomer"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SalesCustomerAdressJoin"
+						},
+						{
+							"name": "StreamingCustomerAdressesJoin"
+						},
+						{
+							"name": "Union1"
+						},
+						{
+							"name": "SelectSalesColumn"
+						},
+						{
+							"name": "SelectStreamingColumn"
+						},
+						{
+							"name": "Union"
+						},
+						{
+							"name": "Union2"
+						},
+						{
+							"name": "SSID4"
+						},
+						{
+							"name": "SSID"
+						},
+						{
+							"name": "SSID2"
+						},
+						{
+							"name": "SSID3"
+						},
+						{
+							"name": "DerivedColumn1"
+						}
+					],
+					"script": "\n\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> SalesSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> SalesSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> FourthCoffeeCustomer\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> VanArselCustomer\nSalesSouthridgeCustomer, SalesSouthridgeAdresses join(SalesSouthridgeCustomer@CustomerID == SalesSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> SalesCustomerAdressJoin\nStreamingSouthridgeCustomer, StreamingSouthridgeAdresses join(StreamingSouthridgeCustomer@CustomerID == StreamingSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> StreamingCustomerAdressesJoin\nSSID2, SSID3 union(byName: true)~> Union1\nSalesCustomerAdressJoin select(mapColumn(\n\t\tCustomerID = SalesSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = SalesSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = SalesSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSalesColumn\nSSID select(mapColumn(\n\t\tCustomerID = StreamingSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = StreamingSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = StreamingSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectStreamingColumn\nSSID4, SelectStreamingColumn union(byName: true)~> Union\nUnion, Union1 union(byName: true)~> Union2\nSelectSalesColumn derive(SourceSystemID = 1) ~> SSID4\nStreamingCustomerAdressesJoin derive(SourceSystemID = 1) ~> SSID\nFourthCoffeeCustomer derive(SourceSystemID = 2) ~> SSID2\nVanArselCustomer derive(SourceSystemID = 3) ~> SSID3\nUnion2 derive(GlobalCustomerID = uuid()) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['DimCustomer.csv'],\n\tpartitionBy('hash', 1)) ~> TargetDimCustomer"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
