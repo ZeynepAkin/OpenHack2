@@ -3,18 +3,10 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [
-				{
-					"dataset": {
-						"referenceName": "DimCustomer2",
-						"type": "DatasetReference"
-					},
-					"name": "DimCustomer"
-				}
-			],
+			"sources": [],
 			"sinks": [],
 			"transformations": [],
-			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> DimCustomer"
+			"script": "\n"
 		}
 	}
 }
