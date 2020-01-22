@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "DimCustomer.csv",
+				"fileName": "DimCustomer",
 				"folderPath": "DWH",
 				"fileSystem": "datafiles1"
 			},
