@@ -1,20 +1,45 @@
 {
-	"name": "dataflow2",
+	"name": "OrderTransactionFact",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "Order",
+						"referenceName": "TargetCloudSalesOrder",
 						"type": "DatasetReference"
 					},
 					"name": "Order"
+				},
+				{
+					"dataset": {
+						"referenceName": "TargetCloudSalesOrderDetail",
+						"type": "DatasetReference"
+					},
+					"name": "OrderDetail"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
-			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> Order"
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "FactOrderTransaction",
+						"type": "DatasetReference"
+					},
+					"name": "TargetOrderTransaction"
+				}
+			],
+			"transformations": [
+				{
+					"name": "OrderJoin"
+				},
+				{
+					"name": "SRDC"
+				},
+				{
+					"name": "JoinSelect"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as string,\n\t\tShipDate as string,\n\t\tTotalCost as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Order\nsource(output(\n\t\tOrderDetailID as string,\n\t\tOrderID as string,\n\t\tMovieID as string,\n\t\tQuantity as string,\n\t\tUnitCost as string,\n\t\tLineNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> OrderDetail\nOrder, OrderDetail join(Order@OrderID == OrderDetail@OrderID,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> OrderJoin\nJoinSelect derive(SourceSystemID = 1,\n\t\tGlobelOrderID = uuid()) ~> SRDC\nOrderJoin select(mapColumn(\n\t\tOrderID = Order@OrderID,\n\t\tCustomerID,\n\t\tOrderDate,\n\t\tShipDate,\n\t\tTotalCost,\n\t\tCreatedDate = Order@CreatedDate,\n\t\tOrderDetailID,\n\t\tMovieID,\n\t\tQuantity,\n\t\tUnitCost,\n\t\tLineNumber,\n\t\tUpdatedDate = Order@UpdatedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> JoinSelect\nSRDC sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Factordertransaction.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true) ~> TargetOrderTransaction"
 		}
 	}
 }
