@@ -13,24 +13,8 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [
-				{
-					"name": "SurrogateKey1"
-				},
-				{
-					"name": "SurrogateKey2"
-				},
-				{
-					"name": "SurrogateKey3"
-				},
-				{
-					"name": "SurrogateKey4"
-				},
-				{
-					"name": "Lookup1"
-				}
-			],
-			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> DimCustomer\nSurrogateKey2 keyGenerate(output({undefined} as long),\n\tstartAt: 1L) ~> SurrogateKey1\nSurrogateKey3 keyGenerate(output({undefined} as long),\n\tstartAt: 1L) ~> SurrogateKey2\nSurrogateKey4 keyGenerate(output({undefined} as long),\n\tstartAt: 1L) ~> SurrogateKey3\nLookup1 keyGenerate(output({undefined} as long),\n\tstartAt: 1L) ~> SurrogateKey4\nDimCustomer lookup(broadcast: 'none')~> Lookup1"
+			"transformations": [],
+			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> DimCustomer"
 		}
 	}
 }
