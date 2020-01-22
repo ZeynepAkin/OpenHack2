@@ -47,7 +47,15 @@
 					"name": "VanArselCustomer"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DimCustomer",
+						"type": "DatasetReference"
+					},
+					"name": "TargetDimCustomer"
+				}
+			],
 			"transformations": [
 				{
 					"name": "SalesCustomerAdressJoin"
@@ -66,9 +74,27 @@
 				},
 				{
 					"name": "Union"
+				},
+				{
+					"name": "Union2"
+				},
+				{
+					"name": "SSID4"
+				},
+				{
+					"name": "SSID"
+				},
+				{
+					"name": "SSID2"
+				},
+				{
+					"name": "SSID3"
+				},
+				{
+					"name": "DerivedColumn1"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> SalesSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> SalesSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> FourthCoffeeCustomer\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> VanArselCustomer\nSalesSouthridgeCustomer, SalesSouthridgeAdresses join(SalesSouthridgeCustomer@CustomerID == SalesSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> SalesCustomerAdressJoin\nStreamingSouthridgeCustomer, StreamingSouthridgeAdresses join(StreamingSouthridgeCustomer@CustomerID == StreamingSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> StreamingCustomerAdressesJoin\nFourthCoffeeCustomer union(byName: true)~> Union1\nSalesCustomerAdressJoin select(mapColumn(\n\t\tCustomerID = SalesSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = SalesSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = SalesSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSalesColumn\nStreamingCustomerAdressesJoin select(mapColumn(\n\t\tCustomerID = StreamingSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = StreamingSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = StreamingSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectStreamingColumn\nSelectSalesColumn, SelectStreamingColumn union(byName: true)~> Union"
+			"script": "\n\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100) ~> SalesSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> SalesSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeCustomer\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> StreamingSouthridgeAdresses\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> FourthCoffeeCustomer\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> VanArselCustomer\nSalesSouthridgeCustomer, SalesSouthridgeAdresses join(SalesSouthridgeCustomer@CustomerID == SalesSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> SalesCustomerAdressJoin\nStreamingSouthridgeCustomer, StreamingSouthridgeAdresses join(StreamingSouthridgeCustomer@CustomerID == StreamingSouthridgeAdresses@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> StreamingCustomerAdressesJoin\nSSID2, SSID3 union(byName: true)~> Union1\nSalesCustomerAdressJoin select(mapColumn(\n\t\tCustomerID = SalesSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = SalesSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = SalesSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSalesColumn\nSSID select(mapColumn(\n\t\tCustomerID = StreamingSouthridgeCustomer@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate = StreamingSouthridgeCustomer@CreatedDate,\n\t\tUpdatedDate = StreamingSouthridgeCustomer@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectStreamingColumn\nSSID4, SelectStreamingColumn union(byName: true)~> Union\nUnion, Union1 union(byName: true)~> Union2\nSelectSalesColumn derive(SourceSystemID = 1) ~> SSID4\nStreamingCustomerAdressesJoin derive(SourceSystemID = 1) ~> SSID\nFourthCoffeeCustomer derive(SourceSystemID = 2) ~> SSID2\nVanArselCustomer derive(SourceSystemID = 3) ~> SSID3\nUnion2 derive(GlobalCustomerID = uuid()) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> TargetDimCustomer"
 		}
 	}
 }
