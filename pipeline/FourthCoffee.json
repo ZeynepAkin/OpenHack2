@@ -225,7 +225,8 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "ActorID"
+									"name": "MovieID",
+									"type": "String"
 								}
 							},
 							{
@@ -234,7 +235,8 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "ActorName"
+									"name": "MovieTitle",
+									"type": "String"
 								}
 							},
 							{
@@ -243,7 +245,38 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "Gender"
+									"name": "Category",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Rating",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Rating",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RunTimeMin",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RunTimeMin",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ReleaseDate",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ReleaseDate",
+									"type": "String"
 								}
 							}
 						]
