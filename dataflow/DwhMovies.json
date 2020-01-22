@@ -22,7 +22,7 @@
 				}
 			],
 			"transformations": [],
-			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nDwhsource sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true) ~> DwhSinkMovies"
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nDwhsource sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieID'],\n\tskipKeyWrites:true,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tMovieID = Dwhsource@MovieID,\n\t\tMovieTitle = Dwhsource@MovieTitle\n\t)) ~> DwhSinkMovies"
 		}
 	}
 }
