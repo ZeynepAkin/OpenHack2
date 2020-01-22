@@ -1,0 +1,1488 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "SouthridgeDF23"
+		},
+		"FourthCoffeeFileServer_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'FourthCoffeeFileServer'"
+		},
+		"VanArselSql_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'VanArselSql'"
+		},
+		"FourthCoffeeFileServer_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "\\\\10.0.0.4\\c$\\Rentals"
+		},
+		"FourthCoffeeFileServer_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "openhackadmin"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCloudStreamingAddresses')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Addresses.csv",
+						"folderPath": "CloudStreaming",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "String"
+					},
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCloudStreamingCustomers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"folderPath": "CloudStreaming",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCloudStreamingTransactions')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Transactions.csv",
+						"folderPath": "CloudStreaming",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetCosmosMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "moviedata",
+						"folderPath": "CosmosMovies",
+						"fileSystem": "datafiles1"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCaffeeMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Movies.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCoffeeActors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Actors.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCoffeeCustomers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCoffeeMovieActors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "MovieActors.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCoffeeOnlineMovieMappings')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OnlineMovieMappings.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TargetFourthCoffeeTransactions')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Transactions.csv",
+						"folderPath": "FourthCoffee",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/VanArsdelCustomer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "dboCustomers.csv",
+						"folderPath": "VanArsdel",
+						"fileSystem": "datafiles1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeFileServer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('FourthCoffeeFileServer_properties_typeProperties_host')]",
+					"userId": "[parameters('FourthCoffeeFileServer_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('FourthCoffeeFileServer_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SouttrighIR",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/VanArselSql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('VanArselSql_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "SouthRightIRVanArsdel",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CloudSales')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SalesOrder",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "OrderID",
+											"type": "Guid"
+										},
+										"sink": {
+											"name": "OrderID",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomerID",
+											"type": "Guid"
+										},
+										"sink": {
+											"name": "CustomerID",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "OrderDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "OrderDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ShipDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ShipDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "TotalCost",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "TotalCost",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "UpdatedDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "UpdatedDate",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudSalesOrder",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudSalesOrder",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "OrderDetail",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SalesOrder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudSalesOrderDetail",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudSalesOrderDetail",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Customers",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "OrderDetail",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudSalesCustomers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudSalesCustomers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "CloudSalesAdresses",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Customers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudSalesAdresses",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudSalesAdresses",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CloudStreaming')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Addresses",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AddressID",
+											"type": "Guid"
+										},
+										"sink": {
+											"name": "AddressID",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomerID",
+											"type": "Guid"
+										},
+										"sink": {
+											"name": "CustomerID",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressLine1",
+											"type": "String"
+										},
+										"sink": {
+											"name": "AddressLine1",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressLine2",
+											"type": "String"
+										},
+										"sink": {
+											"name": "AddressLine2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "City",
+											"type": "String"
+										},
+										"sink": {
+											"name": "City",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "State",
+											"type": "String"
+										},
+										"sink": {
+											"name": "State",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ZipCode",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ZipCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "UpdatedDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "UpdatedDate",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudStreamingAddresses",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudStreamingAddresses",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Customers",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudStreamingCustomers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudStreamingCustomers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Transactions",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CloudStreamingTransactions",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCloudStreamingTransactions",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/TargetCloudStreamingAddresses')]",
+				"[concat(variables('factoryId'), '/datasets/TargetCloudStreamingCustomers')]",
+				"[concat(variables('factoryId'), '/datasets/TargetCloudStreamingTransactions')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cosmosmovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbSqlApiSource",
+								"preferredRegions": []
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings",
+									"quoteAllText": true
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['actors']"
+										},
+										"sink": {
+											"path": "$['actors']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['availabilityDate']"
+										},
+										"sink": {
+											"path": "$['availabilityDate']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['genre']"
+										},
+										"sink": {
+											"path": "$['genre']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['rating']"
+										},
+										"sink": {
+											"path": "$['rating']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['releaseYear']"
+										},
+										"sink": {
+											"path": "$['releaseYear']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['runtime']"
+										},
+										"sink": {
+											"path": "$['runtime']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['streamingAvailabilityDate']"
+										},
+										"sink": {
+											"path": "$['streamingAvailabilityDate']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['tier']"
+										},
+										"sink": {
+											"path": "$['tier']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['title']"
+										},
+										"sink": {
+											"path": "$['title']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['id']"
+										},
+										"sink": {
+											"path": "$['id']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_rid']"
+										},
+										"sink": {
+											"path": "$['_rid']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_self']"
+										},
+										"sink": {
+											"path": "$['_self']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_etag']"
+										},
+										"sink": {
+											"path": "$['_etag']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_attachments']"
+										},
+										"sink": {
+											"path": "$['_attachments']"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_ts']"
+										},
+										"sink": {
+											"path": "$['_ts']"
+										}
+									}
+								],
+								"collectionReference": ""
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CosmosDbSqlMovies",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "TargetCosmosMovies",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/TargetCosmosMovies')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeActors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffeeFileServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "Actors.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FourthCoffeeFileServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeCustomers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffeeFileServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "Customers.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FourthCoffeeFileServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeMovieActors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffeeFileServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "MovieActors.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FourthCoffeeFileServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffeeFileServer",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "Movies.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "String"
+					},
+					{
+						"name": "ActorName",
+						"type": "String"
+					},
+					{
+						"name": "Gender",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FourthCoffeeFileServer')]"
+			]
+		}
+	]
+}
