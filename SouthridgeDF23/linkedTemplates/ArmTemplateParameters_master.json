@@ -20,6 +20,9 @@
 		"MovieCosmosDb_connectionString": {
 			"value": ""
 		},
+		"SouthridgeDWH_connectionString": {
+			"value": ""
+		},
 		"VanArselSql_connectionString": {
 			"value": ""
 		},

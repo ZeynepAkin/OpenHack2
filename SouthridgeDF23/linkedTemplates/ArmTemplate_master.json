@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'MovieCosmosDb'"
 		},
+		"SouthridgeDWH_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SouthridgeDWH'"
+		},
 		"VanArselSql_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'VanArselSql'"
@@ -81,6 +85,9 @@
 					},
 					"MovieCosmosDb_connectionString": {
 						"value": "[parameters('MovieCosmosDb_connectionString')]"
+					},
+					"SouthridgeDWH_connectionString": {
+						"value": "[parameters('SouthridgeDWH_connectionString')]"
 					},
 					"DataLake_properties_typeProperties_url": {
 						"value": "[parameters('DataLake_properties_typeProperties_url')]"
