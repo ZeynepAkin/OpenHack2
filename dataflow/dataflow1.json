@@ -26,6 +26,16 @@
 						"type": "DatasetReference"
 					},
 					"name": "TargetDWCustomer"
+				},
+				{
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable2",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -37,9 +47,18 @@
 				},
 				{
 					"name": "dc"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "DerivedColumn2"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string,\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tSourceSystemID as string,\n\t\tGlobalCustomerID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> TransformCscCustomer\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DWCustomer\nTransformCscCustomer, DWCustomer join(GlobalCustomerID == DWCustomer@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1\nJoin1 split(isNull(DWCustomer@CustomerID),\n\tUpdatedDate>RecordStartDate,\n\tdisjoint: false) ~> ConditionalSplit1@(Insert, Update, Nochange)\nConditionalSplit1@Insert derive(ActiveFlag = 1) ~> dc\ndc sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true) ~> TargetDWCustomer"
+			"script": "\n\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string,\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tSourceSystemID as string,\n\t\tGlobalCustomerID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> TransformCscCustomer\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DWCustomer\nTransformCscCustomer, DWCustomer join(GlobalCustomerID == DWCustomer@CustomerID,\n\tjoinType:'left',\n\tbroadcast: 'none')~> Join1\nJoin1 split(isNull(DWCustomer@CustomerID),\n\tUpdatedDate>RecordStartDate,\n\tdisjoint: false) ~> ConditionalSplit1@(Insert, Update, Nochange)\nConditionalSplit1@Insert derive(ActiveFlag = 1) ~> dc\nConditionalSplit1@Update alterRow(updateIf(true())) ~> AlterRow1\nConditionalSplit1@Update derive(ActiveFlag = 1,\n\t\tRecordStartDate = currentDate()) ~> DerivedColumn1\nAlterRow1 derive(RecordEndDate = currentDate(),\n\t\tActiveFlag = 0) ~> DerivedColumn2\ndc sink(input(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true) ~> TargetDWCustomer\nDerivedColumn1 sink() ~> sink1\nDerivedColumn2 sink(input(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:true,\n\tupsertable:false,\n\tkeys:['GlobalCustomerID'],\n\tformat: 'table',\n\tstaged: false) ~> sink2"
 		}
 	}
 }
