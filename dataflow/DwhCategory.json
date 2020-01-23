@@ -29,7 +29,7 @@
 					"name": "AlterRow1"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DwhsourceCategory\nDwhsourceCategory aggregate(groupBy(Category),\n\tCategoryX = count(Category)) ~> Aggregate1\nAggregate1 alterRow(upsertIf(not(isNull(Category)))) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieCategoryDescription'],\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieCategoryDescription = Category\n\t)) ~> DwhsinkCategory"
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> DwhsourceCategory\nDwhsourceCategory aggregate(groupBy(Category),\n\tCategoryX = count(Category)) ~> Aggregate1\nAggregate1 alterRow(upsertIf(not(isNull(Category)))) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieCategoryDescription'],\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieCategoryDescription = Category\n\t)) ~> DwhsinkCategory"
 		}
 	}
 }
