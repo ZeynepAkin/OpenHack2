@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "Dim_Category",
+						"referenceName": "DimCategory",
 						"type": "DatasetReference"
 					},
 					"name": "DwhsinkCategory"
