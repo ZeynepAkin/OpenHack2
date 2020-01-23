@@ -10,6 +10,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "Dwhsource"
+				},
+				{
+					"dataset": {
+						"referenceName": "DimRaiting",
+						"type": "DatasetReference"
+					},
+					"name": "raitingJoin"
+				},
+				{
+					"dataset": {
+						"referenceName": "DimCategory",
+						"type": "DatasetReference"
+					},
+					"name": "categoryJoin"
 				}
 			],
 			"sinks": [
@@ -27,9 +41,15 @@
 				},
 				{
 					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Join1"
+				},
+				{
+					"name": "Join2"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nDerivedColumn1 alterRow(upsertIf(not(isNull(MovieID)))) ~> AlterRow1\nDwhsource derive(MovieRunTimeMin = 1,\n\t\tRatingSK = 1,\n\t\tCategorySK = 1) ~> DerivedColumn1\nAlterRow1 sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieID'],\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieID,\n\t\tMovieTitle,\n\t\tMovieCategorySK = CategorySK,\n\t\tMovieRatingSK = RatingSK,\n\t\tMovieRunTimeMin\n\t)) ~> DwhSinkMovies"
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Dwhsource\nsource(output(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> raitingJoin\nsource(output(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> categoryJoin\nDerivedColumn1 alterRow(upsertIf(not(isNull(MovieID)))) ~> AlterRow1\nDwhsource derive(MovieRunTimeMin = 1) ~> DerivedColumn1\nAlterRow1, raitingJoin join(Rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1\nJoin1, categoryJoin join(Category == MovieCategoryDescription,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join2\nJoin2 sink(input(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['MovieID'],\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tMovieID,\n\t\tMovieTitle,\n\t\tMovieCategorySK,\n\t\tMovieRatingSK,\n\t\tMovieRunTimeMin\n\t)) ~> DwhSinkMovies"
 		}
 	}
 }
