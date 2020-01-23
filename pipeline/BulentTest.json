@@ -19,9 +19,6 @@
 						"referenceName": "DwhMovies",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"folderPath": "datafiles1/Staging"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
