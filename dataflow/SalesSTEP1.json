@@ -1,5 +1,5 @@
 {
-	"name": "Sales",
+	"name": "SalesSTEP1",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -13,15 +13,19 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "AzureSynapseAnalyticsTable2",
+						"referenceName": "Cstmr",
 						"type": "DatasetReference"
 					},
 					"name": "Customer"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
-			"script": "\n\nsource(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as string,\n\t\tShipDate as string,\n\t\tTotalCost as string,\n\t\tCreatedDate as string,\n\t\tOrderDetailID as string,\n\t\tMovieID as string,\n\t\tQuantity as string,\n\t\tUnitCost as string,\n\t\tLineNumber as string,\n\t\tUpdatedDate as string,\n\t\tSourceSystemID as string,\n\t\tGlobelOrderID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Sales\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Customer"
+			"transformations": [
+				{
+					"name": "Filter1"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tOrderID as string,\n\t\tCustomerID as string,\n\t\tOrderDate as string,\n\t\tShipDate as string,\n\t\tTotalCost as string,\n\t\tCreatedDate as string,\n\t\tOrderDetailID as string,\n\t\tMovieID as string,\n\t\tQuantity as string,\n\t\tUnitCost as string,\n\t\tLineNumber as string,\n\t\tUpdatedDate as string,\n\t\tSourceSystemID as string,\n\t\tGlobelOrderID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> Sales\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> Customer\nCustomer filter(ERROR_FUNCTION('')) ~> Filter1"
 		}
 	}
 }
