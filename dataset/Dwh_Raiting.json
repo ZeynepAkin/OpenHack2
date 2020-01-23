@@ -1,0 +1,26 @@
+{
+	"name": "Dwh_Raiting",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SouthridgeDWH",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "MovieRatingSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MovieRatingDescription",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimRatings"
+		}
+	}
+}
