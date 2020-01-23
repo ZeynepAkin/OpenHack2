@@ -1,0 +1,26 @@
+{
+	"name": "Dim_Category",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SouthridgeDWH",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "MovieCategorySK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MovieCategoryDescription",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimCategories"
+		}
+	}
+}
