@@ -1,0 +1,24 @@
+{
+	"name": "DwhRating",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TargetFourthCaffeeMovies",
+						"type": "DatasetReference"
+					},
+					"name": "DwhRating"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "Aggregate1"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> DwhRating\nDwhRating aggregate(groupBy(Rating),\n\tRatingX = count(Rating)) ~> Aggregate1"
+		}
+	}
+}
