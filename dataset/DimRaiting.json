@@ -1,5 +1,5 @@
 {
-	"name": "Dwh_Raiting",
+	"name": "DimRaiting",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SouthridgeDWH",
