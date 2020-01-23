@@ -12,13 +12,24 @@
 					"name": "DwhRating"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DimRaiting",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "Aggregate1"
+				},
+				{
+					"name": "AlterRow1"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> DwhRating\nDwhRating aggregate(groupBy(Rating),\n\tRatingX = count(Rating)) ~> Aggregate1"
+			"script": "\n\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as string,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100) ~> DwhRating\nDwhRating aggregate(groupBy(Rating),\n\tRatingX = count(Rating)) ~> Aggregate1\nAggregate1 alterRow(upsertIf(not(isNull(Rating)))) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true) ~> sink1"
 		}
 	}
 }
